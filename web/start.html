@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Game - Home</title>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="start.css" />
+</head>
+<body class="start-page">
+  <div class="start-shell">
+    <header class="start-topbar" aria-label="Player summary">
+      <div class="player-chip">
+        <div id="playerAvatar" class="player-avatar" aria-hidden="true">R</div>
+        <div class="player-copy">
+          <p class="player-name"></p>
+        </div>
+      </div>
+      <div class="score-chip" aria-label="Points">
+        <span class="score-bolt" aria-hidden="true">&#9889;</span>
+        <strong id="topbarPoints">0</strong>
+      </div>
+    </header>
+    <main class="dashboard-grid" aria-label="Quiz dashboard">
+      <section class="left-panel">
+        <article class="task-card">
+          <div class="task-icon">&#9875;</div>
+          <div class="task-copy">
+            <p class="task-title">Daily Task</p>
+            <p id="dailyTaskMeta" class="task-meta">10 Questions</p>
+            <div id="dailyTaskProgress" class="progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <span id="dailyTaskFill" class="progress-fill" style="width:0%"></span>
+            </div>
+            <p class="task-progress"><span id="dailyTaskMessage">Solve 10 to keep your streak!</span><strong id="dailyTaskCount">0/10</strong></p>
+          </div>
+        </article>
+
+        <div class="section-head">
+          <h2>Quiz Categories</h2>
+          
+        </div>
+
+        <div class="quiz-grid">
+          <article class="quiz-card"><span class="icon">&#129504;</span><p>General Knowledge</p></article>
+          <article class="quiz-card"><span class="icon">&#128300;</span><p>Science</p></article>
+          <article class="quiz-card is-selected" aria-selected="true"><span class="icon">&#9917;</span><p>Sport</p></article>
+          <article class="quiz-card"><span class="icon">&#128187;</span><p>Computer Science</p></article>
+          <article class="quiz-card"><span class="icon">&#127916;</span><p>Entertainment Film</p></article>
+          <article class="quiz-card"><span class="icon">&#127963;</span><p>History</p></article>
+          <article class="quiz-card"><span class="icon">&#127757;</span><p>Geography</p></article>
+          <article class="quiz-card"><span class="icon">&#128481;</span><p>Anime</p></article>
+          <article class="quiz-card"><span class="icon">&#128208;</span><p>Mathematics</p></article>
+          
+          <article class="quiz-card"><span class="icon">&#127912;</span><p>Art</p></article>
+          <article class="quiz-card"><span class="icon">&#128060;</span><p>Animal</p></article> 
+          <article class="quiz-card"><span class="icon">&#127963;</span><p>politics</p></article>
+          <article class="quiz-card"><span class="icon">&#128009;</span><p>Mythology</p></article>
+          
+
+        </div>
+
+        <div class="actions">
+          <button id="startQuizBtn" type="button" class="primary">Start Quiz</button>
+          <button id="leaderboardBtn" type="button" class="secondary">Leaderboard</button>
+        </div>
+      </section>
+    </main>
+    <nav class="navigation" aria-label="Bottom navigation">
+      <ul>
+        <li class="list" data-nav="profile"><a href="#" ><span class="nav-icon" aria-hidden="true">&#128100;</span><span class="nav-label">Profile</span></a></li>
+        <li class="list" data-nav="favorites"><a href="#"><span class="nav-icon" aria-hidden="true">&#128278;</span><span class="nav-label">Favorites</span></a></li>
+        <li class="list active" data-nav="home"><a href="#"><span class="nav-icon" aria-hidden="true">&#127968;</span><span class="nav-label">Home</span></a></li>
+        <li class="list" data-nav="search"><a href="#"><span class="nav-icon" aria-hidden="true">&#128270;</span><span class="nav-label">Search</span></a></li>
+        <li class="list" data-nav="settings"><a href="#"><span class="nav-icon" aria-hidden="true">&#9881;</span><span class="nav-label">Settings</span></a></li>
+      </ul>
+    </nav>
+
+    <section id="profileSection" class="profile-section" aria-labelledby="profileTitle" hidden>
+      <div class="profile-section-card">
+        <div class="profile-head">
+          <div id="profileAvatar" class="profile-avatar" aria-hidden="true">R</div>
+          <div class="profile-copy">
+            <h2 id="profileTitle"></h2>
+            <p>Expert Player</p>
+          </div>
+        </div>
+        <div class="profile-stats" aria-label="Profile stats">
+          <article><span>Points</span><strong id="profilePoints">1200</strong></article>
+          <article><span>Streak</span><strong id="profileStreak">9 Days</strong></article>
+          <article><span>Solved</span><strong id="profileSolved">214</strong></article>
+        </div>
+        <div class="profile-actions">
+          <button id="editProfileBtn" type="button" class="secondary">Edit Profile</button>
+          <button id="viewAchievementsBtn" type="button" class="primary">View Achievements</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="achievementsSection" class="profile-section" aria-labelledby="achievementsTitle" hidden>
+      <div class="profile-section-card">
+        <div class="panel-head">
+          <h2 id="achievementsTitle">Achievements</h2>
+        </div>
+        <p id="achievementsStatus" class="panel-note">Checking your progress...</p>
+        <div id="achievementsList" class="achievements-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="favoritesSection" class="profile-section" aria-labelledby="favoritesTitle" hidden>
+      <div class="profile-section-card">
+        <div class="panel-head">
+          <h2 id="favoritesTitle">Saved Topics</h2>
+        </div>
+        <p id="favoritesStatus" class="panel-note">No favorites yet. Add hearts on Home.</p>
+        <div id="favoritesGrid" class="quiz-grid panel-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="leaderboardSection" class="profile-section" aria-labelledby="leaderboardTitle" hidden>
+      <div class="profile-section-card">
+        <div class="panel-head">
+          <h2 id="leaderboardTitle">Leaderboard</h2>
+        </div>
+        <p id="leaderboardStatus" class="panel-note">Loading leaderboard...</p>
+        <div id="leaderboardList" class="leaderboard-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="searchSection" class="profile-section" aria-labelledby="searchTitle" hidden>
+      <div class="profile-section-card">
+        <div class="panel-head">
+          <h2 id="searchTitle">Search Topics</h2>
+        </div>
+        <div class="panel-search">
+          <label for="searchInput" class="sr-only">Search quiz topics</label>
+          <input id="searchInput" type="search" placeholder="Search by topic name" autocomplete="off">
+        </div>
+        <p id="searchStatus" class="panel-note">Type to find topics.</p>
+        <div id="searchResults" class="quiz-grid panel-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="settingsSection" class="profile-section" aria-labelledby="settingsTitle" hidden>
+      <div class="profile-section-card">
+        <div class="panel-head">
+          <h2 id="settingsTitle">Settings</h2>
+        </div>
+        <p id="settingsStatus" class="panel-note">Choose an action below.</p>
+        <div class="profile-actions">
+          <button id="settingsShowAllBtn" type="button" class="secondary">Go to Home</button>
+          <button id="settingsChangePasswordBtn" type="button" class="secondary">Change Password</button>
+          <button id="settingsFeedbackBtn" type="button" class="secondary">Send Feedback</button>
+          <button id="settingsClearFavBtn" type="button" class="secondary">Clear Saved Topics</button>
+          <button id="settingsLogoutBtn" type="button" class="primary">Logout</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="editProfileModal" class="auth-modal" hidden>
+      <div class="auth-panel">
+        <h2>Edit Profile</h2>
+        <form id="editProfileForm" novalidate>
+          <input id="editProfileNameInput" type="text" placeholder="Full Name" required>
+          <button id="editProfileSaveBtn" type="submit" class="primary">Save</button>
+        </form>
+        <button id="editProfileCloseBtn" type="button" class="secondary close-btn">Close</button>
+      </div>
+    </div>
+
+    <div id="changePasswordModal" class="auth-modal" hidden>
+      <div class="auth-panel">
+        <h2>Change Password</h2>
+        <form id="changePasswordForm" novalidate>
+          <input id="changeCurrentPasswordInput" type="password" placeholder="Current Password" required minlength="4">
+          <input id="changeNewPasswordInput" type="password" placeholder="New Password (min 4 chars)" required minlength="4">
+          <input id="changeConfirmPasswordInput" type="password" placeholder="Confirm New Password" required minlength="4">
+          <button id="changePasswordSaveBtn" type="submit" class="primary">Update Password</button>
+        </form>
+        <button id="changePasswordCloseBtn" type="button" class="secondary close-btn">Close</button>
+      </div>
+    </div>
+
+    <div id="feedbackModal" class="auth-modal" hidden>
+      <div class="auth-panel">
+        <h2>Send Feedback</h2>
+        <form id="feedbackForm" novalidate>
+          <textarea id="feedbackMessageInput" placeholder="Share your feedback" rows="4" required></textarea>
+          <button id="feedbackSendBtn" type="submit" class="primary">Send</button>
+        </form>
+        <button id="feedbackCloseBtn" type="button" class="secondary close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="./script.js"></script>
+</body>
+</html>

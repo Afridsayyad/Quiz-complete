@@ -1,0 +1,7 @@
+{
+  "java.project.referencedLibraries": [
+    "javafx-sdk-25.0.2/lib/*.jar",
+    "lib/sqlite-jdbc-3.51.2.0.jar"
+  ],
+  "editor.suggestOnTriggerCharacters": false
+}

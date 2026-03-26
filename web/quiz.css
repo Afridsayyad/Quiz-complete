@@ -1,0 +1,187 @@
+body.quiz-page {
+  margin: 0;
+  min-height: 100dvh;
+  padding: clamp(12px, 2.4vw, 18px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background:
+    linear-gradient(180deg, rgba(3, 8, 18, 0.4), rgba(6, 14, 30, 0.62)),
+    radial-gradient(circle at 50% 15%, rgba(255, 88, 255, 0.12), transparent 42%),
+    radial-gradient(circle at 30% 70%, rgba(111, 182, 255, 0.16), transparent 46%),
+    url("bg.jpg") center/cover no-repeat;
+}
+
+.quiz-card {
+  position: relative;
+  width: min(820px, calc(100vw - 20px));
+  min-height: min(640px, calc(100dvh - 24px));
+  border-radius: 24px;
+  padding: clamp(16px, 2.4vw, 26px);
+  border: 1px solid rgba(122, 208, 255, 0.32);
+  background: linear-gradient(145deg, rgba(8, 16, 32, 0.9), rgba(10, 26, 52, 0.88));
+  box-shadow:
+    0 22px 48px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.quiz-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.quiz-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quiz-top h1 {
+  margin: 0;
+  font-size: clamp(22px, 4.5vw, 32px);
+  line-height: 1;
+  color: #e3d8ff;
+}
+
+#progress {
+  font-size: 12px;
+  color: #dfeaff;
+  font-weight: 700;
+  border: 1px solid rgba(122, 208, 255, 0.45);
+  background: rgba(20, 40, 72, 0.55);
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
+.quiz-timer {
+  font-size: 12px;
+  color: #03172f;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  background: linear-gradient(135deg, #6fb6ff, #9ee0ff);
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
+.quiz-timer.is-warning {
+  color: #ffffff;
+  background: #c23b2a;
+  border-color: rgba(152, 34, 21, 0.9);
+}
+
+.quiz-question {
+  margin: 0;
+  font-size: clamp(20px, 3vw, 26px);
+  color: #e9f5ff;
+  line-height: 1.4;
+  font-weight: 800;
+  text-align: center;
+  padding: 20px 16px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(122, 208, 255, 0.2), transparent 40%),
+    linear-gradient(180deg, rgba(18, 38, 76, 0.8), rgba(10, 22, 48, 0.82));
+  border: 1px solid rgba(122, 208, 255, 0.32);
+  box-shadow:
+    inset 0 0 24px rgba(111, 182, 255, 0.26),
+    0 14px 28px rgba(0, 0, 0, 0.45);
+}
+
+.quiz-options {
+  display: grid;
+  gap: 12px;
+  flex: 1;
+  align-content: start;
+}
+
+.quiz-option {
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(122, 208, 255, 0.28);
+  background: linear-gradient(160deg, rgba(12, 24, 48, 0.88), rgba(6, 14, 30, 0.9));
+  color: #e9f5ff;
+  font-size: clamp(15px, 2.6vw, 18px);
+  font-weight: 800;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.quiz-option:hover:enabled {
+  border-color: rgba(122, 208, 255, 0.7);
+  box-shadow: 0 12px 24px rgba(122, 208, 255, 0.18);
+}
+
+.quiz-option.correct {
+  border-color: rgba(111, 214, 173, 0.9);
+  box-shadow: 0 12px 28px rgba(111, 214, 173, 0.28);
+}
+
+.quiz-option.wrong {
+  border-color: rgba(255, 99, 146, 0.9);
+  box-shadow: 0 12px 28px rgba(255, 99, 146, 0.25);
+}
+
+.quiz-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.quiz-status {
+  margin: 0;
+  color: #dfeaff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.quiz-next {
+  width: auto;
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(219, 176, 89, 0.62);
+  background: linear-gradient(135deg, #6fb6ff, #7ad0ff);
+  color: #03172f;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.quiz-next:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 560px) {
+  .quiz-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .quiz-card {
+    min-height: min(640px, calc(100dvh - 18px));
+    padding: 12px;
+  }
+
+  .quiz-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quiz-next {
+    width: 100%;
+    text-align: center;
+  }
+}

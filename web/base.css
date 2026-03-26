@@ -1,0 +1,127 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #050a12;
+  color: #e7f1ff;
+}
+
+.start-page,
+.login-page {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.start-page {
+  overflow: hidden;
+}
+
+.login-page {
+  background: linear-gradient(180deg, #f6eee2 0%, #f7c77f 45%, #f39a34 100%);
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.forest-bg,
+.leaves {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hill {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.hill-1 { width: 180%; height: 45%; left: -40%; bottom: 16%; background: #f5d399; }
+.hill-2 { width: 170%; height: 38%; left: -36%; bottom: 8%; background: #efbe77; }
+.hill-3 { width: 190%; height: 34%; left: -45%; bottom: -4%; background: #eeaa4b; }
+
+.tree {
+  position: absolute;
+  width: 58px;
+  height: 78%;
+  bottom: 0;
+  background: #8d2d26;
+  border-radius: 26px 26px 0 0;
+}
+
+.tree::before,
+.tree::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: #f4651a;
+}
+
+.tree::before { width: 180px; height: 120px; top: -80px; left: -62px; }
+.tree::after { width: 130px; height: 90px; top: -115px; left: -38px; }
+.tree-left { left: 7%; }
+.tree-right { right: 10%; }
+
+.leaf {
+  position: absolute;
+  width: 20px;
+  height: 10px;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #b9541e, #f57a0a);
+  transform-origin: center;
+  opacity: 0.75;
+}
+
+.leaf::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 11px;
+  left: 50%;
+  top: 1px;
+  transform: translateX(-50%);
+  background: rgba(123, 55, 17, 0.55);
+}
+
+.l1 { left: 16%; top: -12%; animation-duration: 14s; animation-delay: 0s; }
+.l2 { left: 44%; top: -15%; animation-duration: 12s; animation-delay: -2s; }
+.l3 { left: 78%; top: -10%; animation-duration: 15s; animation-delay: -3s; }
+
+@keyframes fall {
+  0% { transform: translateY(-8vh) translateX(0) rotate(0deg); opacity: 0.9; }
+  50% { transform: translateY(52vh) translateX(18px) rotate(90deg); opacity: 1; }
+  100% { transform: translateY(108vh) translateX(-12px) rotate(180deg); opacity: 0.85; }
+}
+
+.autumn-card {
+  background: linear-gradient(145deg, rgba(255, 248, 240, 0.75), rgba(248, 196, 114, 0.75));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+.subtitle {
+  margin: 0;
+  color: #8a332b;
+  font-size: 14px;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

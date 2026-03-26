@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "LoginWindow",
+      "request": "launch",
+      "mainClass": "LoginWindow",
+      "vmArgs": "--module-path \"${workspaceFolder}/javafx-sdk-25.0.2/lib\" --add-modules javafx.controls,javafx.web --enable-native-access=javafx.graphics,javafx.web,ALL-UNNAMED"
+    },
+    {
+      "type": "java",
+      "name": "StartingWindow",
+      "request": "launch",
+      "mainClass": "StartingWindow",
+      "vmArgs": "--module-path \"${workspaceFolder}/javafx-sdk-25.0.2/lib\" --add-modules javafx.controls,javafx.web --enable-native-access=javafx.graphics,javafx.web,ALL-UNNAMED"
+    },
+    {
+      "type": "java",
+      "name": "QuizGame",
+      "request": "launch",
+      "mainClass": "QuizGame",
+      "vmArgs": "--module-path \"${workspaceFolder}/javafx-sdk-25.0.2/lib\" --add-modules javafx.controls,javafx.web --enable-native-access=javafx.graphics,javafx.web,ALL-UNNAMED"
+    }
+  ]
+}

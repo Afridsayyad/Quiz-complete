@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Game</title>
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="quiz.css">
+</head>
+<body class="quiz-page">
+  <main class="quiz-card">
+    <div class="quiz-top">
+      <h1 id="quizTitle">Quiz Game</h1>
+      <div class="quiz-meta">
+        <span id="progress">Question 1 / 5</span>
+        <span id="timer" class="quiz-timer">Time: 20s</span>
+      </div>
+    </div>
+
+    <p id="question" class="quiz-question"></p>
+
+    <div id="options" class="quiz-options"></div>
+
+  <div class="quiz-footer">
+    <p id="status" class="quiz-status">Select an answer</p>
+    <button id="nextBtn" class="quiz-next" disabled>Next</button>
+  </div>
+</main>
+
+  <script type="module" src="./quiz.js"></script>
+</body>
+</html>
