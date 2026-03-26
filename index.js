@@ -50,6 +50,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/", (_req, res) => {
+  res.send("Server is running ✅");
+});
+
 const EMAIL_REGEX = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
 const OTP_TTL_MS = 5 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
