@@ -9,10 +9,13 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+// ? PORT (Render compatible)
 const PORT = process.env.PORT || 4000;
 
-// ?? SMTP env
-const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com";
+/* =========================
+   ?? SMTP CONFIG (Brevo)
+========================= */
+const SMTP_HOST = process.env.SMTP_HOST || "smtp-relay.brevo.com";
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
@@ -21,11 +24,13 @@ const SMTP_FROM_NAME = process.env.SMTP_FROM_NAME || "Quiz Game";
 const SMTP_SECURE =
   process.env.SMTP_SECURE === "true" || SMTP_PORT === 465;
 
-// ?? Debug logs
-console.log("?? SMTP USER:", SMTP_USER ? "Loaded ?" : "Missing ?");
-console.log("?? FROM EMAIL:", SMTP_FROM_EMAIL);
+// ? Debug
+console.log("SMTP USER:", SMTP_USER ? "Loaded" : "Missing");
+console.log("FROM EMAIL:", SMTP_FROM_EMAIL);
 
-// ?? Firebase init
+/* =========================
+   ?? FIREBASE INIT
+========================= */
 const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 
 if (!serviceAccountJson) {
@@ -49,7 +54,9 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// ?? SMTP transporter
+/* =========================
+   ?? NODEMAILER SETUP
+========================= */
 if (!SMTP_USER || !SMTP_PASS) {
   console.error("? SMTP_USER or SMTP_PASS missing");
   process.exit(1);
@@ -65,15 +72,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// ?? Verify SMTP connection
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("? SMTP connection failed:", error);
-  } else {
-    console.log("? SMTP ready");
-  }
-});
+// ? Verify SMTP
+transporter.verify()
+  .then(() => console.log("? SMTP ready"))
+  .catch(err => console.error("? SMTP error:", err.message));
 
+// ?? Send Mail function
 async function sendMail({ to, subject, html }) {
   const from = `${SMTP_FROM_NAME} <${SMTP_FROM_EMAIL}>`;
 
@@ -88,7 +92,9 @@ async function sendMail({ to, subject, html }) {
   return info;
 }
 
-// ?? CORS
+/* =========================
+   ?? CORS
+========================= */
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -97,20 +103,29 @@ app.use((req, res, next) => {
   next();
 });
 
-// ?? Root
+/* =========================
+   ?? ROUTES
+========================= */
+
+// Root
 app.get("/", (_req, res) => {
-  res.send("Server is running ?");
+  res.send("Server is running ??");
 });
 
-// ?? Test email
+// Health check
+app.get("/health", (_req, res) => {
+  res.json({ ok: true });
+});
+
+// Test Email
 app.get("/test-email", async (_req, res) => {
   try {
     const testTo = process.env.TEST_EMAIL || SMTP_USER;
 
     await sendMail({
       to: testTo,
-      subject: "Test Email ?",
-      html: "<h1>SMTP working ??</h1>"
+      subject: "Test Email ??",
+      html: "<h1>SMTP working ?</h1>"
     });
 
     res.send("Email sent ?");
@@ -120,7 +135,10 @@ app.get("/test-email", async (_req, res) => {
   }
 });
 
-// ?? OTP Config
+/* =========================
+   ?? OTP LOGIC
+========================= */
+
 const EMAIL_REGEX = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
 const OTP_TTL_MS = 5 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
@@ -131,9 +149,9 @@ const hashCode = (code) =>
 const generateOtp = () =>
   String(100000 + Math.floor(Math.random() * 900000));
 
-// ?? Send OTP
+// Send OTP email
 async function sendOtpEmail(email, code) {
-  console.log("?? Sending OTP to:", email);
+  console.log("Sending OTP to:", email);
 
   await sendMail({
     to: email,
@@ -142,7 +160,7 @@ async function sendOtpEmail(email, code) {
   });
 }
 
-// ? SEND OTP
+// SEND OTP
 app.post("/otp/send", async (req, res) => {
   try {
     const email = (req.body?.email || "").trim().toLowerCase();
@@ -176,7 +194,7 @@ app.post("/otp/send", async (req, res) => {
   }
 });
 
-// ? VERIFY OTP
+// VERIFY OTP
 app.post("/otp/verify", async (req, res) => {
   try {
     const email = (req.body?.email || "").trim().toLowerCase();
@@ -241,12 +259,9 @@ app.post("/otp/verify", async (req, res) => {
   }
 });
 
-// ?? Health check
-app.get("/health", (_req, res) => {
-  res.json({ ok: true });
-});
-
-// ?? Start server
+/* =========================
+   ?? START SERVER
+========================= */
 app.listen(PORT, () => {
   console.log(`?? Server running on port ${PORT}`);
 });
