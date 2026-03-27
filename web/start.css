@@ -852,7 +852,7 @@ body.start-page {
   background: rgba(14, 26, 50, 0.7);
   padding: 10px 12px;
   display: grid;
-  gap: 4px;
+  gap: 6px;
 }
 
 .achievement-item.unlocked {
@@ -887,6 +887,34 @@ body.start-page {
   color: #b9c9e8;
   font-size: 13px;
   font-weight: 600;
+}
+
+.achievement-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.achievement-equip-btn {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(143, 201, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  color: #d7e7ff;
+  cursor: pointer;
+}
+
+.achievement-equip-btn.is-equipped {
+  border-color: rgba(122, 208, 255, 0.85);
+  background: linear-gradient(135deg, #6fb6ff, #7ad0ff);
+  color: #042041;
+  box-shadow: 0 8px 16px rgba(111, 182, 255, 0.25);
+}
+
+.panel-note.highlight {
+  color: #7ad0ff;
 }
 
 .auth-modal[hidden] {

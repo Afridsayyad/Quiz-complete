@@ -39,6 +39,7 @@ const leaderboardList = document.getElementById("leaderboardList");
 const leaderboardStatus = document.getElementById("leaderboardStatus");
 const achievementsList = document.getElementById("achievementsList");
 const achievementsStatus = document.getElementById("achievementsStatus");
+const equippedAchievementEl = document.getElementById("equippedAchievement");
 const searchInput = document.getElementById("searchInput");
 const searchResults = document.getElementById("searchResults");
 const searchStatus = document.getElementById("searchStatus");
@@ -93,6 +94,7 @@ const USER_FULL_NAME_KEY = "quiz_user_full_name";
 const FAVORITES_KEY = "quiz_favorite_topics";
 const SELECTED_CATEGORY_KEY = "quiz_selected_category";
 const SELECTED_CATEGORY_ID_KEY = "quiz_selected_category_id";
+const EQUIPPED_ACH_KEY = "quiz_equipped_achievement";
 
 const TOPIC_TO_TRIVIA_CATEGORY = {
   "general knowledge": 9,
@@ -125,6 +127,20 @@ function getStoredSessionValue(key) {
   } catch (error) {
     return "";
   }
+}
+
+function loadEquippedAchievement() {
+  try {
+    return localStorage.getItem(EQUIPPED_ACH_KEY) || "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function saveEquippedAchievement(title) {
+  try {
+    localStorage.setItem(EQUIPPED_ACH_KEY, title || "");
+  } catch (error) { }
 }
 
 function getSessionUid() {
@@ -468,12 +484,12 @@ function createLeaderboardRow(rank, entry) {
   return row;
 }
 
-function createAchievementItem(title, description, unlocked) {
+function createAchievementItem(title, description, unlocked, isEquipped, onEquip) {
   const card = document.createElement("article");
   card.className = `achievement-item${unlocked ? " unlocked" : ""}`;
   const badge = document.createElement("span");
   badge.className = "achievement-badge";
-  badge.textContent = unlocked ? "Unlocked" : "Locked";
+  badge.textContent = isEquipped ? "Equipped" : unlocked ? "Unlocked" : "Locked";
   const heading = document.createElement("h3");
   heading.className = "achievement-title";
   heading.textContent = title;
@@ -483,6 +499,17 @@ function createAchievementItem(title, description, unlocked) {
   card.appendChild(badge);
   card.appendChild(heading);
   card.appendChild(desc);
+  if (unlocked) {
+    const actions = document.createElement("div");
+    actions.className = "achievement-actions";
+    const equipBtn = document.createElement("button");
+    equipBtn.type = "button";
+    equipBtn.className = `achievement-equip-btn${isEquipped ? " is-equipped" : ""}`;
+    equipBtn.textContent = isEquipped ? "Equipped" : "Equip";
+    equipBtn.addEventListener("click", () => onEquip && onEquip(title));
+    actions.appendChild(equipBtn);
+    card.appendChild(actions);
+  }
   return card;
 }
 
@@ -500,6 +527,7 @@ async function renderAchievementsPanel() {
     if (achievementsStatus) achievementsStatus.textContent = "Login required to view achievements.";
     return;
   }
+  const equippedTitle = loadEquippedAchievement();
   const target = Math.max(30, latestStats.dailyTarget || 0);
   const solvedToday = latestStats.dailySolvedToday || 0;
   const stats = {
@@ -534,9 +562,25 @@ async function renderAchievementsPanel() {
   let unlockedCount = 0;
   achievements.forEach((item) => {
     if (item.unlocked) unlockedCount++;
-    achievementsList.appendChild(createAchievementItem(item.title, item.description, item.unlocked));
+    const isEquipped = equippedTitle === item.title;
+    achievementsList.appendChild(
+      createAchievementItem(item.title, item.description, item.unlocked, isEquipped, (title) => {
+        saveEquippedAchievement(title);
+        showToast(`Equipped: ${title}`, "success", 1600);
+        renderAchievementsPanel();
+      })
+    );
   });
   if (achievementsStatus) achievementsStatus.textContent = `${unlockedCount}/${achievements.length} achievements unlocked.`;
+  if (equippedAchievementEl) {
+    if (equippedTitle) {
+      equippedAchievementEl.textContent = `Equipped: ${equippedTitle}`;
+      equippedAchievementEl.removeAttribute("hidden");
+    } else {
+      equippedAchievementEl.textContent = "";
+      equippedAchievementEl.setAttribute("hidden", "");
+    }
+  }
 }
 
 function openSearchSection() {
@@ -895,4 +939,3 @@ async function initializeApp() {
 initializeApp().catch((error) => {
   console.error("Initialization failed", error);
 });
-
