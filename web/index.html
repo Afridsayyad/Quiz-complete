@@ -29,11 +29,7 @@
         <input id="signupEmail" type="email" placeholder="Email ID" required>
         <input id="signupPassword" type="password" placeholder="Password" required minlength="4">
         <input id="signupConfirmPassword" type="password" placeholder="Confirm Password" required minlength="4">
-        <div class="otp-row">
-          <input id="signupOtp" type="text" placeholder="OTP (6 digits)" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
-          <button id="signupRequestOtpBtn" class="otp-request-btn" type="button">Send OTP</button>
-        </div>
-        <p id="signupOtpStatus" class="otp-status" aria-live="polite"></p>
+        <p class="otp-status info">A verification email will be sent after signup.</p>
         <button id="signupSubmitBtn" type="submit">Sign Up</button>
       </form>
       <button id="signupCloseBtn" class="close-btn" type="button">Close</button>
@@ -58,7 +54,8 @@
       registerUser,
       loginUser,
       fetchUserDoc,
-      sendPasswordResetLink
+      sendPasswordResetLink,
+      sendVerificationEmail
     } from "./firebase-service.js";
 
     const EMAIL_REGEX = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
@@ -85,11 +82,6 @@
     const forgotEmailInput = $("forgotEmail");
     const forgotSubmitBtn = $("forgotSubmitBtn");
     const forgotStatus = $("forgotStatus");
-    const signupOtpInput = $("signupOtp");
-    const signupRequestOtpBtn = $("signupRequestOtpBtn");
-    const signupOtpStatus = $("signupOtpStatus");
-    const OTP_CODE_REGEX = /^\d{6}$/;
-    let otpRequestEmail = "";
     const normalize = (v) => (v == null ? "" : String(v).trim());
     const validCreds = (email, password) => EMAIL_REGEX.test(email) && password && password.length >= 4;
     const setSubmitting = (btn, on, idle, busy) => {
@@ -106,81 +98,11 @@
       if (name) localStorage.setItem(USER_FULL_NAME_KEY, name);
     };
 
-    const showOtpStatus = (message, state = "info") => {
-      if (!signupOtpStatus) return;
-      signupOtpStatus.textContent = message || "";
-      signupOtpStatus.className = `otp-status ${state}`;
-    };
-
     const showForgotOtpStatus = (message, state = "info") => {
       if (!forgotStatus) return;
       forgotStatus.textContent = message || "";
       forgotStatus.className = `otp-status ${state}`;
     };
-
-    const setOtpButtonState = (disabled, label) => {
-      if (!signupRequestOtpBtn) return;
-      signupRequestOtpBtn.disabled = disabled;
-      signupRequestOtpBtn.textContent = label;
-      signupRequestOtpBtn.style.opacity = disabled ? "0.6" : "1";
-    };
-    const setOtpButtonVisible = (visible) => {
-      if (!signupRequestOtpBtn) return;
-      signupRequestOtpBtn.style.display = visible ? "" : "none";
-    };
-    const nextTick = () => new Promise((resolve) => setTimeout(resolve, 0));
-
-    const OTP_API_BASE = window.OTP_API_BASE || "https://quiz-backend-volq.onrender.com";
-
-    async function callOtpApi(path, payload) {
-      const response = await fetch(`${OTP_API_BASE}${path}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload || {})
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.message || data.error || "OTP server error.");
-      }
-      if (!data.success) {
-        throw new Error(data.message || "OTP request failed.");
-      }
-      return data;
-    }
-
-    async function requestSignupOtpFor(email) {
-      if (!EMAIL_REGEX.test(email)) {
-        throw new Error("Enter a valid email before requesting OTP.");
-      }
-      setOtpButtonState(true, "Sending...");
-      await nextTick(); // allow paint
-      try {
-        const data = await callOtpApi("/otp/send", { email });
-        otpRequestEmail = email;
-        showOtpStatus("OTP sent to your inbox.", "success");
-        setOtpButtonVisible(false);
-      } finally {
-        setOtpButtonState(false, "Send OTP");
-      }
-    }
-
-    async function verifyOtpForSignup(email, otp) {
-      if (otpRequestEmail !== email) {
-        throw new Error("Request OTP for this email before verifying.");
-      }
-      await callOtpApi("/otp/verify", { email, code: otp });
-      otpRequestEmail = "";
-      if (signupOtpInput) signupOtpInput.value = "";
-      showOtpStatus("OTP verified.", "success");
-    }
-
-    async function ensureOtpVerified(email) {
-      const otpValue = normalize(signupOtpInput?.value);
-      if (!OTP_CODE_REGEX.test(otpValue)) {
-        throw new Error("Enter the 6-digit OTP sent to your email.");
-      }
-      await verifyOtpForSignup(email, otpValue);
-    }
 
     async function handleSignup(event) {
       event.preventDefault();
@@ -193,11 +115,12 @@
         if (!fullName) return alert("Please enter your full name.");
         if (!validCreds(email, password)) return alert("Enter a valid email and password.");
         if (password !== confirmPassword) return alert("Password and confirm password must match.");
-        await ensureOtpVerified(email);
         const user = await registerUser({ fullName, email, password });
-        storeSession(user, { fullName });
-        alert("Account created. Redirecting to home.");
-        window.location.href = "start.html";
+        alert(
+          `Account created. A verification link has been sent to ${user.email}. Please verify and then log in.`
+        );
+        signupModal.classList.add("hidden");
+        signupForm.reset();
       } catch (error) {
         const message = (error && error.message) || "Unable to sign up right now.";
         alert(message.replace("Firebase: ", ""));
@@ -220,7 +143,19 @@
       } catch (error) {
         const code = (error && error.code) || "";
         const message = (error && error.message) || "";
-        if (
+        if (code === "auth/email-not-verified") {
+          const resend = confirm(
+            "Email not verified. Check your inbox (and spam). Resend verification email?"
+          );
+          if (resend) {
+            try {
+              await sendVerificationEmail();
+              alert("Verification email sent again.");
+            } catch (err) {
+              alert("Could not resend verification link right now.");
+            }
+          }
+        } else if (
           code.includes("wrong-password") ||
           code.includes("invalid-credential") ||
           message.includes("wrong-password") ||
@@ -257,9 +192,6 @@
 
     const openSignupModal = () => {
       signupForm.reset();
-      otpRequestEmail = "";
-      showOtpStatus("", "info");
-      setOtpButtonVisible(true);
       signupModal.classList.remove("hidden");
     };
     const closeSignupModal = () => signupModal.classList.add("hidden");
@@ -282,16 +214,6 @@
     forgotForm.addEventListener("submit", handleForgotSubmit);
     signupForm.addEventListener("submit", handleSignup);
     loginForm.addEventListener("submit", handleLogin);
-    if (signupRequestOtpBtn) {
-      signupRequestOtpBtn.addEventListener("click", async () => {
-        const email = normalize(signupEmailInput.value);
-        try {
-          await requestSignupOtpFor(email);
-        } catch (error) {
-          showOtpStatus((error && error.message) || "Unable to send OTP.", "error");
-        }
-      });
-    }
   </script>
 </body>
 </html>

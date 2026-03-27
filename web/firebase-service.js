@@ -4,11 +4,13 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
+  sendEmailVerification,
   signOut,
   updateProfile,
   updatePassword,
   reauthenticateWithCredential,
-  EmailAuthProvider
+  EmailAuthProvider,
+  reload
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 import {
   getFirestore,
@@ -75,11 +77,22 @@ export async function registerUser({ fullName, email, password }) {
   const credential = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(credential.user, { displayName: fullName });
   await ensureUserDoc(credential.user);
+  await sendEmailVerification(credential.user);
+  // enforce verified login; sign out to avoid unverified session
+  await signOut(auth);
   return credential.user;
 }
 
 export async function loginUser({ email, password }) {
   const credential = await signInWithEmailAndPassword(auth, email, password);
+  await reload(credential.user);
+  if (!credential.user.emailVerified) {
+    await sendEmailVerification(credential.user);
+    await signOut(auth);
+    const error = new Error("Email not verified. Verification link sent again.");
+    error.code = "auth/email-not-verified";
+    throw error;
+  }
   await ensureUserDoc(credential.user);
   return credential.user;
 }
@@ -210,4 +223,10 @@ export function signOutUser() {
 
 export function getAuthInstance() {
   return auth;
+}
+
+export async function sendVerificationEmail(user = auth.currentUser) {
+  if (!user) throw new Error("No authenticated user.");
+  await sendEmailVerification(user);
+  return true;
 }
