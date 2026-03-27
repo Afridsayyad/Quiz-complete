@@ -9,11 +9,11 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// ? PORT (Render compatible)
+// ✅ PORT (Render compatible)
 const PORT = process.env.PORT || 4000;
 
 /* =========================
-   ?? SMTP CONFIG (Brevo)
+   📧 SMTP CONFIG (Brevo)
 ========================= */
 const SMTP_HOST = process.env.SMTP_HOST || "smtp-relay.brevo.com";
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
@@ -21,28 +21,29 @@ const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM_EMAIL = process.env.SMTP_FROM_EMAIL || SMTP_USER;
 const SMTP_FROM_NAME = process.env.SMTP_FROM_NAME || "Quiz Game";
-const SMTP_SECURE =
-  process.env.SMTP_SECURE === "true" || SMTP_PORT === 465;
 
-// ? Debug
+// 🔍 Debug logs
+console.log("SMTP HOST:", SMTP_HOST);
+console.log("SMTP PORT:", SMTP_PORT);
 console.log("SMTP USER:", SMTP_USER ? "Loaded" : "Missing");
-console.log("FROM EMAIL:", SMTP_FROM_EMAIL);
 
 /* =========================
-   ?? FIREBASE INIT
+   🔥 FIREBASE INIT
 ========================= */
 const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 
 if (!serviceAccountJson) {
-  console.error("? FIREBASE_SERVICE_ACCOUNT_JSON missing");
+  console.error("❌ FIREBASE_SERVICE_ACCOUNT_JSON missing");
   process.exit(1);
 }
 
 let serviceAccount;
 try {
-  serviceAccount = JSON.parse(serviceAccountJson);
+  serviceAccount = JSON.parse(
+    serviceAccountJson.replace(/\\n/g, "\n") // ✅ FIX
+  );
 } catch (err) {
-  console.error("? Invalid Firebase JSON");
+  console.error("❌ Invalid Firebase JSON:", err.message);
   process.exit(1);
 }
 
@@ -55,29 +56,31 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 /* =========================
-   ?? NODEMAILER SETUP
+   📧 NODEMAILER SETUP
 ========================= */
 if (!SMTP_USER || !SMTP_PASS) {
-  console.error("? SMTP_USER or SMTP_PASS missing");
+  console.error("❌ SMTP_USER or SMTP_PASS missing");
   process.exit(1);
 }
 
 const transporter = nodemailer.createTransport({
   host: SMTP_HOST,
   port: SMTP_PORT,
-  secure: SMTP_SECURE,
+  secure: false, // ⚠️ always false for 587/2525
   auth: {
     user: SMTP_USER,
     pass: SMTP_PASS
-  }
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000
 });
 
-// ? Verify SMTP
+// ✅ Verify SMTP
 transporter.verify()
-  .then(() => console.log("? SMTP ready"))
-  .catch(err => console.error("? SMTP error:", err.message));
+  .then(() => console.log("✅ SMTP ready"))
+  .catch(err => console.error("❌ SMTP error:", err.message));
 
-// ?? Send Mail function
+// 📩 Send Mail function
 async function sendMail({ to, subject, html }) {
   const from = `${SMTP_FROM_NAME} <${SMTP_FROM_EMAIL}>`;
 
@@ -88,12 +91,12 @@ async function sendMail({ to, subject, html }) {
     html
   });
 
-  console.log("?? Email sent:", info.messageId);
+  console.log("📨 Email sent:", info.messageId);
   return info;
 }
 
 /* =========================
-   ?? CORS
+   🌐 CORS
 ========================= */
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -104,12 +107,12 @@ app.use((req, res, next) => {
 });
 
 /* =========================
-   ?? ROUTES
+   🧪 ROUTES
 ========================= */
 
 // Root
 app.get("/", (_req, res) => {
-  res.send("Server is running ??");
+  res.send("Server is running 🚀");
 });
 
 // Health check
@@ -124,19 +127,19 @@ app.get("/test-email", async (_req, res) => {
 
     await sendMail({
       to: testTo,
-      subject: "Test Email ??",
-      html: "<h1>SMTP working ?</h1>"
+      subject: "Test Email 🚀",
+      html: "<h1>SMTP working ✅</h1>"
     });
 
-    res.send("Email sent ?");
+    res.send("Email sent ✅");
   } catch (err) {
-    console.error("? Test Error:", err);
+    console.error("❌ Test Error:", err);
     res.status(500).send(err.message);
   }
 });
 
 /* =========================
-   ?? OTP LOGIC
+   🔐 OTP LOGIC
 ========================= */
 
 const EMAIL_REGEX = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
@@ -183,10 +186,10 @@ app.post("/otp/send", async (req, res) => {
 
     await sendOtpEmail(email, code);
 
-    res.json({ success: true, message: "OTP sent ?" });
+    res.json({ success: true, message: "OTP sent ✅" });
 
   } catch (err) {
-    console.error("? OTP send error:", err);
+    console.error("❌ OTP send error:", err);
     res.status(500).json({
       success: false,
       message: err.message
@@ -248,10 +251,10 @@ app.post("/otp/verify", async (req, res) => {
 
     await docRef.delete();
 
-    res.json({ success: true, message: "OTP verified ?" });
+    res.json({ success: true, message: "OTP verified ✅" });
 
   } catch (err) {
-    console.error("? OTP verify error:", err);
+    console.error("❌ OTP verify error:", err);
     res.status(500).json({
       success: false,
       message: "Verification failed"
@@ -260,8 +263,8 @@ app.post("/otp/verify", async (req, res) => {
 });
 
 /* =========================
-   ?? START SERVER
+   🚀 START SERVER
 ========================= */
 app.listen(PORT, () => {
-  console.log(`?? Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
