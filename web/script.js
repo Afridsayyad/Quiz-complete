@@ -4,7 +4,8 @@ import {
   updateProfileFullName,
   changeUserPassword,
   submitFeedback,
-  signOutUser
+  signOutUser,
+  setEquippedAchievement
 } from "./firebase-service.js";
 
 const navItems = document.querySelectorAll(".navigation .list");
@@ -137,10 +138,16 @@ function loadEquippedAchievement() {
   }
 }
 
-function saveEquippedAchievement(title) {
+async function saveEquippedAchievement(title) {
+  const safeTitle = title || "";
   try {
-    localStorage.setItem(EQUIPPED_ACH_KEY, title || "");
+    localStorage.setItem(EQUIPPED_ACH_KEY, safeTitle);
   } catch (error) { }
+  try {
+    await setEquippedAchievement(safeTitle);
+  } catch (error) {
+    console.warn("Unable to persist equipped achievement to server:", error);
+  }
 }
 
 function getSessionUid() {
@@ -170,7 +177,9 @@ function getPointTier(points) {
 function applyProfileTier(points) {
   const badge = document.getElementById("profileBadge");
   if (!badge) return;
-  badge.textContent = getPointTier(points);
+  const equippedTitle =
+    (latestStats && latestStats.equippedAchievement) || loadEquippedAchievement();
+  badge.textContent = equippedTitle || getPointTier(points);
 }
 
 function applyProfileStats(points, solved, streak) {
@@ -472,7 +481,7 @@ function createLeaderboardRow(rank, entry) {
   scoreEl.textContent = `${entry.points} pts`;
   const tierEl = document.createElement("span");
   tierEl.className = "leaderboard-tier";
-  tierEl.textContent = getPointTier(entry.points);
+  tierEl.textContent = entry.equippedAchievement || getPointTier(entry.points);
   const metaEl = document.createElement("span");
   metaEl.className = "leaderboard-meta";
   metaEl.textContent = `${entry.solved} solved | ${entry.streak} day streak`;
@@ -564,8 +573,8 @@ async function renderAchievementsPanel() {
     if (item.unlocked) unlockedCount++;
     const isEquipped = equippedTitle === item.title;
     achievementsList.appendChild(
-      createAchievementItem(item.title, item.description, item.unlocked, isEquipped, (title) => {
-        saveEquippedAchievement(title);
+      createAchievementItem(item.title, item.description, item.unlocked, isEquipped, async (title) => {
+        await saveEquippedAchievement(title);
         showToast(`Equipped: ${title}`, "success", 1600);
         renderAchievementsPanel();
       })

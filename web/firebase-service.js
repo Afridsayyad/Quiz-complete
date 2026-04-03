@@ -129,6 +129,17 @@ export async function fetchUserDoc(uid) {
   return snapshot.exists() ? snapshot.data() : null;
 }
 
+export async function setEquippedAchievement(title = "") {
+  const user = auth.currentUser;
+  if (!user) throw new Error("No authenticated user.");
+  const userRef = doc(db, USERS_COLLECTION, user.uid);
+  await updateDoc(userRef, {
+    equippedAchievement: title || "",
+    updatedAt: serverTimestamp()
+  });
+  return title || "";
+}
+
 export async function recordQuizProgress({ correct = 0, total = 0, categoryKey = "" }) {
   const user = auth.currentUser;
   if (!user) throw new Error("No authenticated user.");
@@ -197,7 +208,8 @@ export async function fetchLeaderboard(limitCount = 25) {
       name: data.fullName || (data.email || "Player"),
       points: data.points || 0,
       solved: data.solvedCount || 0,
-      streak: data.streakDays || 0
+      streak: data.streakDays || 0,
+      equippedAchievement: data.equippedAchievement || ""
     });
   });
 
